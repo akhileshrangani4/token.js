@@ -79,7 +79,7 @@ export const convertMessages = (
           ? message.content
           : message.content?.map(
               (m) => (m as ChatCompletionContentPartText).text
-            )
+            ).join('');
       return {
         role: message.role,
         content,
@@ -269,11 +269,10 @@ export class MistralHandler extends BaseHandler<MistralModel> {
 
     const endpoint = this.opts.baseURL ?? undefined
     const client = new MistralClient(apiKey, endpoint)
+    const hasTools = !!body.tools && body.tools.length > 0;
     const responseFormat: ResponseFormat | undefined =
-      body.response_format?.type === 'json_object'
-        ? {
-            type: 'json_object',
-          }
+      body.response_format?.type === 'json_object' && !hasTools
+        ? { type: 'json_object' }
         : undefined
 
     const temperature =
